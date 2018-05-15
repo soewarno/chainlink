@@ -22,7 +22,10 @@ matrix:
       env: COMMAND=./internal/ci/truffle_test
     - language: go
       go: "1.10"
-      env: COMMAND=./internal/ci/ethereum_test
+      env: COMMAND=./internal/ci/ethereum_test devnet
+    - language: go
+      go: "1.10"
+      env: COMMAND=./internal/ci/ethereum_test gethnet
 
 before_install:
   # Go dependency manager dep

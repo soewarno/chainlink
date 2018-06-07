@@ -89,6 +89,9 @@ func guiEngine(app *services.ChainlinkApplication) *gin.Engine {
 
 	box := packr.NewBox("../gui/dist/")
 	engine.StaticFS("/", box)
+	engine.NoRoute(func(c *gin.Context) {
+		c.File("../gui/dist/404.html")
+	})
 
 	return engine
 }

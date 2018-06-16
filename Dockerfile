@@ -1,7 +1,7 @@
 # Build Chainlink
 FROM golang:1.10-alpine as builder
 
-RUN apk add --no-cache make curl git gcc musl-dev linux-headers
+RUN apk add --no-cache make curl git gcc musl-dev linux-headers alpine-sdk yarn python
 RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 ADD . /go/src/github.com/smartcontractkit/chainlink

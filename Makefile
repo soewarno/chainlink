@@ -7,7 +7,7 @@ LDFLAGS=-ldflags "-X github.com/smartcontractkit/chainlink/store.Sha=`git rev-pa
 dep: ## Ensure chainlink's go dependencies are installed.
 	@dep ensure
 
-build: dep ## Build chainlink.
+build: dep gui ## Build chainlink.
 	@go build $(LDFLAGS) -o chainlink
 
 install: dep ## Install chainlink

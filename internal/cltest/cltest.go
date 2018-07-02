@@ -247,8 +247,9 @@ func NewJobSubscriber() (*store.Store, services.JobSubscriber, func()) {
 
 // CommonJSON has an ID, and Name
 type CommonJSON struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Digest string `json:"digest"`
 }
 
 // ParseCommonJSON will unmarshall given body into CommonJSON

@@ -109,9 +109,21 @@ func (rm *jobRunner) workerLoop(runID string, workerChannel chan store.RunReques
 	}
 }
 
+func isClosed(ch <-chan struct{}) bool {
+	select {
+	case <-ch:
+		return true
+	default:
+	}
+
+	return false
+}
+
 // Stop closes all open worker channels.
 func (rm *jobRunner) Stop() {
-	close(rm.closer)
+	if !isClosed(rm.closer) {
+		close(rm.closer)
+	}
 }
 
 // WorkerCount returns the current number of available worker channels.

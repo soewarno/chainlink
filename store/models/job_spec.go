@@ -26,15 +26,23 @@ func NewJobFromRequest(jsr JobSpecRequest) (JobSpec, error) {
 	if err != nil {
 		return JobSpec{}, err
 	}
+	b, err := json.Marshal(&jsr)
+	if err != nil {
+		return JobSpec{}, err
+	}
+	n, err := NormalizeSpecJSON(string(b))
+	if err != nil {
+		return JobSpec{}, err
+	}
 
 	return JobSpec{
-		ID:         utils.NewBytes32ID(),
-		CreatedAt:  Time{Time: time.Now()},
-		Initiators: jsr.Initiators,
-		Tasks:      jsr.Tasks,
-		StartAt:    jsr.StartAt,
-		EndAt:      jsr.EndAt,
-		Digest:     fmt.Sprintf("0x%x", digest.Sum(nil)),
+		ID:             fmt.Sprintf("%x", digest),
+		CreatedAt:      Time{Time: time.Now()},
+		Initiators:     jsr.Initiators,
+		Tasks:          jsr.Tasks,
+		StartAt:        jsr.StartAt,
+		EndAt:          jsr.EndAt,
+		NormalizedJSON: n,
 	}, nil
 }
 
@@ -42,13 +50,14 @@ func NewJobFromRequest(jsr JobSpecRequest) (JobSpec, error) {
 // for a given contract. It contains the Initiators, Tasks (which are the
 // individual steps to be carried out), StartAt, EndAt, and CreatedAt fields.
 type JobSpec struct {
-	ID         string      `json:"id" storm:"id,unique"`
-	CreatedAt  Time        `json:"createdAt" storm:"index"`
-	Initiators []Initiator `json:"initiators"`
-	Tasks      []TaskSpec  `json:"tasks" storm:"inline"`
-	StartAt    null.Time   `json:"startAt" storm:"index"`
-	EndAt      null.Time   `json:"endAt" storm:"index"`
-	Digest     string      `json:"digest"`
+	ID             string      `json:"id" storm:"id,unique"`
+	CreatedAt      Time        `json:"createdAt" storm:"index"`
+	Initiators     []Initiator `json:"initiators"`
+	Tasks          []TaskSpec  `json:"tasks" storm:"inline"`
+	StartAt        null.Time   `json:"startAt" storm:"index"`
+	EndAt          null.Time   `json:"endAt" storm:"index"`
+	Digest         string      `json:"digest"`
+	NormalizedJSON string      `json:"normalizedJSON"`
 }
 
 // GetID returns the ID of this structure for jsonapi serialization.

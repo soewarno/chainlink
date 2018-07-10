@@ -2,6 +2,7 @@ package web_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -91,6 +92,34 @@ func TestJobSpecsController_Create(t *testing.T) {
 	app, cleanup := cltest.NewApplication()
 	defer cleanup()
 
+	j := cltest.FixtureCreateJobViaWeb(t, app, "../internal/fixtures/web/hello_world_job.json")
+
+	adapter1, _ := adapters.For(j.Tasks[0], app.Store)
+	httpGet := cltest.UnwrapAdapter(adapter1).(*adapters.HTTPGet)
+	assert.Equal(t, httpGet.URL.String(), "https://bitstamp.net/api/ticker/")
+
+	adapter2, _ := adapters.For(j.Tasks[1], app.Store)
+	jsonParse := cltest.UnwrapAdapter(adapter2).(*adapters.JSONParse)
+	assert.Equal(t, jsonParse.Path, []string{"last"})
+
+	adapter4, _ := adapters.For(j.Tasks[3], app.Store)
+	signTx := cltest.UnwrapAdapter(adapter4).(*adapters.EthTx)
+	assert.Equal(t, "0x356a04bCe728ba4c62A30294A55E6A8600a320B3", signTx.Address.String())
+	assert.Equal(t, "0x609ff1bd", signTx.FunctionSelector.String())
+
+	var initr models.Initiator
+	app.Store.One("JobID", j.ID, &initr)
+	assert.Equal(t, models.InitiatorWeb, initr.Type)
+}
+
+func TestJobSpecsController_Create_SpecID(t *testing.T) {
+	t.Parallel()
+
+	app, cleanup := cltest.NewApplication()
+	defer cleanup()
+
+	expectedJSON := `{"endAt":null,"initiators":[{"address":"0x0000000000000000000000000000000000000000","id":0.000000e+00,"jobId":"","time":"0001-01-01T00:00:00Z","type":"web"}],"startAt":null,"tasks":[{"confirmations":0.000000e+00,"type":"httpget","url":"https://bitstamp.net/api/ticker/"},{"confirmations":0.000000e+00,"path":["last"],"type":"jsonparse"},{"confirmations":0.000000e+00,"type":"ethbytes32"},{"address":"0x356a04bce728ba4c62a30294a55e6a8600a320b3","confirmations":0.000000e+00,"functionSelector":"0x609ff1bd","type":"ethtx"}]}`
+
 	resp := cltest.BasicAuthPost(
 		app.Server.URL+"/v2/specs",
 		"application/json",
@@ -98,10 +127,13 @@ func TestJobSpecsController_Create(t *testing.T) {
 	)
 	defer resp.Body.Close()
 	cltest.AssertServerResponse(t, resp, 200)
+	var j presenters.JobSpec
+	b, err := ioutil.ReadAll(resp.Body)
+	assert.NoError(t, err)
+	assert.NoError(t, json.Unmarshal(b, &j))
 
-	js := cltest.ParseCommonJSON(resp.Body)
-	j := cltest.FindJob(app.Store, js.ID)
-	assert.NotEqual(t, "", js.Digest)
+	assert.NotEqual(t, "", j.Digest)
+	assert.Equal(t, expectedJSON, j.NormalizedJSON)
 
 	adapter1, _ := adapters.For(j.Tasks[0], app.Store)
 	httpGet := cltest.UnwrapAdapter(adapter1).(*adapters.HTTPGet)

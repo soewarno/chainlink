@@ -69,7 +69,7 @@ func TestObjectDigest(t *testing.T) {
 				assert.NoError(t, err)
 			}
 
-			assert.Equal(t, test.hash, fmt.Sprintf("0x%x", digest.Sum(nil)))
+			assert.Equal(t, test.hash, fmt.Sprintf("0x%x", digest))
 		})
 	}
 }
@@ -117,7 +117,7 @@ func TestObjectDigest_ProducesDeterministicResult(t *testing.T) {
 				digest, err := ObjectDigest(object)
 				assert.NoError(t, err)
 
-				hash := fmt.Sprintf("0x%x", digest.Sum(nil))
+				hash := fmt.Sprintf("0x%x", digest)
 				if firstHash == "" {
 					firstHash = hash
 				}
@@ -149,11 +149,11 @@ func TestObjectDigest_DifferentTypesProduceDifferentHashes(t *testing.T) {
 
 			firstDigest, err := ObjectDigest(test.firstObject)
 			assert.NoError(t, err)
-			firstHash := fmt.Sprintf("0x%x", firstDigest.Sum(nil))
+			firstHash := fmt.Sprintf("0x%x", firstDigest)
 
 			secondDigest, err := ObjectDigest(test.secondObject)
 			assert.NoError(t, err)
-			secondHash := fmt.Sprintf("0x%x", secondDigest.Sum(nil))
+			secondHash := fmt.Sprintf("0x%x", secondDigest)
 
 			assert.NotEqual(t, firstHash, secondHash, fmt.Sprintf("%+v should not produce the same hash as %+v", test.firstObject, test.secondObject))
 		})

@@ -11,7 +11,8 @@ import JobRunsList from 'components/JobRunsList'
 import formatInitiators from 'utils/formatInitiators'
 import jobSpecDefinition from 'utils/jobSpecDefinition'
 import Link from 'components/Link'
-import Copy from 'components/CopyJobSpec'
+import Copy from 'components/Copy'
+import Divider from '@material-ui/core/Divider'
 import { withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -29,6 +30,11 @@ const styles = theme => ({
     marginBottom: theme.spacing.unit * 5
   },
   definitionTitle: {
+    marginTop: theme.spacing.unit,
+    marginBottom: theme.spacing.unit * 3
+  },
+  divider: {
+    marginTop: theme.spacing.unit,
     marginBottom: theme.spacing.unit * 3
   },
   breadcrumb: {
@@ -50,11 +56,22 @@ const renderJobSpec = ({classes, jobSpec, latestJobRuns, jobRunsCount}) => (
   <Grid container spacing={40}>
     <Grid item xs={8}>
       <PaddedCard>
-        <Typography variant='title' className={classes.definitionTitle}>
-          Definition
-        </Typography>
-        <Copy JobSpec={JSON.stringify(jobSpecDefinition(jobSpec), null, "\t")}/>     
-	<PrettyJson object={jobSpecDefinition(jobSpec)} />
+        <Grid container alignItems='flex-start'>
+          <Grid item xs={6}>
+            <Typography variant='title' className={classes.definitionTitle}>
+              Definition
+            </Typography>
+          </Grid>
+          <Grid item xs={6} align='right'>
+            <Copy
+              buttonText='Copy JobSpec'
+              data={JSON.stringify(jobSpecDefinition(jobSpec), null, '\t')}
+            />
+          </Grid>
+        </Grid>
+
+        <Divider light className={classes.divider} />
+        <PrettyJson object={jobSpecDefinition(jobSpec)} />
       </PaddedCard>
     </Grid>
     <Grid item xs={4}>

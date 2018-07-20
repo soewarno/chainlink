@@ -1,14 +1,10 @@
 import url from 'url'
 
 export default (path, query = {}, options = {}) => {
-  let formatOptions = {
-    pathname: path,
-    query: query
-  }
+  let formatOptions = Object.assign(
+    {pathname: path, query: query},
+    options
+  )
 
-  if (options.port) {
-    formatOptions['port'] = options.port
-    formatOptions['hostname'] = options.hostname
-  }
   return url.format(formatOptions)
 }

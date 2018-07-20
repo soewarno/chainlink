@@ -1,22 +1,33 @@
+import 'isomorphic-unfetch'
 import formatRequestURI from 'utils/formatRequestURI'
 import { camelizeKeys } from 'humps'
-import 'isomorphic-unfetch'
+import { AuthenticationError } from 'errors'
 
 const formatURI = (path, query = {}) => {
-  return formatRequestURI(path, query, {
-    hostname: global.location.hostname,
-    port: process.env.CHAINLINK_PORT
-  })
+  return formatRequestURI(
+    path,
+    query,
+    {
+      hostname: global.location.hostname,
+      port: process.env.CHAINLINK_PORT
+    }
+  )
 }
 
-const request = (path, query) => (
-  global.fetch(
-    formatURI(path, query),
-    {credentials: 'include'}
-  )
-    .then(response => response.json())
+const request = (path, query) => {
+  const uri = formatURI(path, query)
+  return global.fetch(uri)
+    .then(response => {
+      if (response.status === 401) {
+        throw new AuthenticationError(response.statusText)
+      }
+
+      return response.json()
+    })
     .then((data) => camelizeKeys(data))
-)
+}
+
+export const signIn = (email, password) => request('/v2/config')
 
 export const getJobs = (page, size) => request('/v2/specs', {page: page, size: size})
 

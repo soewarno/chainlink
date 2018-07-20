@@ -13,11 +13,8 @@ export default {
   }),
   getRoutes: async () => {
     return [
-      {
-        path: '/',
-        component: 'src/containers/Jobs',
-        getData: () => buildInfo
-      },
+      {path: '/', component: 'src/containers/Jobs', getData: () => buildInfo},
+      {path: '/sign_in', component: 'src/containers/SignIn'},
       {path: '/job_specs/_jobSpecId_'},
       {path: '/job_specs/_jobSpecId_/runs'},
       {path: '/job_specs/_jobSpecId_/runs/_jobRunId_'},
@@ -62,6 +59,10 @@ export default {
             <meta name='viewport' content='width=device-width, initial-scale=1' />
             <link
               href='https://fonts.googleapis.com/css?family=Roboto:300,400,500'
+              rel='stylesheet'
+            />
+            <link
+              href='https://fonts.googleapis.com/icon?family=Material+Icons'
               rel='stylesheet'
             />
             <link

@@ -1,5 +1,37 @@
 import * as api from 'api'
+import { AuthenticationError } from 'errors'
 import { pascalCase } from 'change-case'
+
+export const REQUEST_SIGN_IN = 'REQUEST_SIGN_IN'
+export const RECEIVE_SIGN_IN_SUCCESS = 'RECEIVE_SIGN_IN_SUCCESS'
+export const RECEIVE_SIGN_IN_FAIL = 'RECEIVE_SIGN_IN_FAIL'
+export const RECEIVE_SIGN_IN_ERROR = 'RECEIVE_SIGN_IN_ERROR'
+
+const signInSuccess = () => ({type: RECEIVE_SIGN_IN_SUCCESS})
+const signInFail = () => ({type: RECEIVE_SIGN_IN_FAIL})
+const signInError = (error) => ({type: RECEIVE_SIGN_IN_ERROR, error: error})
+
+export const signIn = (email, password) => {
+  return dispatch => {
+    dispatch(requestAction(REQUEST_SIGN_IN))
+
+    return api.signIn(email, password)
+      .then(() => dispatch(signInSuccess()))
+      .catch(error => {
+        // TODO: Hardcode sign in success until it can be connected to working
+        // auth endpoint
+        if (email === 'chainlink' && password === 'twochains') {
+          dispatch(signInSuccess())
+        } else {
+          if (error instanceof AuthenticationError) {
+            dispatch(signInFail())
+          } else {
+            dispatch(signInError(error))
+          }
+        }
+      })
+  }
+}
 
 const fetchActions = {}
 

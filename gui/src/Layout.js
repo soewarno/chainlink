@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import Routes from 'react-static-routes'
 import AppBar from '@material-ui/core/AppBar'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -9,15 +10,20 @@ import ListItemText from '@material-ui/core/ListItemText'
 import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
+import Flash from 'components/Flash'
+import PrivateRoute from './PrivateRoute'
 import universal from 'react-universal-component'
 import { Link, Router, Route, Switch } from 'react-static'
 import { hot } from 'react-hot-loader'
 import { withStyles } from '@material-ui/core/styles'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
 import logoImg from './logo.svg'
 
 // Use universal-react-component for code-splitting non-static routes
 const Bridges = universal(import('./containers/Bridges'))
 const Configuration = universal(import('./containers/Configuration'))
+const Jobs = universal(import('./containers/Jobs'))
 const JobSpec = universal(import('./containers/JobSpec'))
 const JobSpecRuns = universal(import('./containers/JobSpecRuns'))
 const JobSpecRun = universal(import('./containers/JobSpecRun'))
@@ -61,6 +67,10 @@ const styles = theme => {
     },
     toolbar: {
       minHeight: appBarHeight
+    },
+    flash: {
+      marginTop: appBarHeight,
+      textAlign: 'center'
     }
   }
 }
@@ -77,7 +87,7 @@ class Layout extends Component {
   }
 
   render () {
-    const {classes} = this.props
+    const {classes, errors} = this.props
     const {drawerOpen} = this.state
 
     const drawer = (
@@ -151,14 +161,22 @@ class Layout extends Component {
               </Grid>
             </AppBar>
 
+            {
+              errors.length > 0 &&
+              <Flash error className={classes.flash}>
+                {errors.map((msg, i) => <p key={i}>{msg}</p>)}
+              </Flash>
+            }
+
             <div className={classes.content}>
               <div className={classes.toolbar} />
               <Switch>
-                <Route exact path='/job_specs/:jobSpecId' component={JobSpec} />
-                <Route exact path='/job_specs/:jobSpecId/runs' component={JobSpecRuns} />
-                <Route exact path='/job_specs/:jobSpecId/runs/:jobRunId' component={JobSpecRun} />
-                <Route exact path='/config' component={Configuration} />
-                <Route exact path='/bridges' component={Bridges} />
+                <PrivateRoute exact path='/' component={Jobs} />
+                <PrivateRoute exact path='/job_specs/:jobSpecId' component={JobSpec} />
+                <PrivateRoute exact path='/job_specs/:jobSpecId/runs' component={JobSpecRuns} />
+                <PrivateRoute exact path='/job_specs/:jobSpecId/runs/:jobRunId' component={JobSpecRun} />
+                <PrivateRoute exact path='/config' component={Configuration} />
+                <PrivateRoute exact path='/bridges' component={Bridges} />
                 <Routes />
               </Switch>
             </div>
@@ -171,6 +189,20 @@ class Layout extends Component {
   }
 }
 
-const LayoutWithStyles = withStyles(styles)(Layout)
+Layout.propTypes = {
+  errors: PropTypes.array
+}
+
+Layout.defaultProps = {
+  errors: []
+}
+
+const mapStateToProps = state => ({
+  errors: state.errors
+})
+
+export const ConnectedLayout = connect(mapStateToProps)(Layout)
+
+const LayoutWithStyles = withStyles(styles)(ConnectedLayout)
 
 export default hot(module)(LayoutWithStyles)

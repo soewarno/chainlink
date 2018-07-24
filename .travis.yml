@@ -18,6 +18,9 @@ matrix:
     - language: go
       go: "1.10"
       env: COMMAND=./internal/ci/gui_test
+    - language: go
+      go: "1.10"
+      env: COMMAND=./internal/ci/rust_test
 
 before_install:
   # Go dependency manager dep
@@ -31,6 +34,10 @@ before_install:
   - sudo apt-get install -y -qq yarn
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > $GOPATH/bin/cc-test-reporter
   - chmod +x $GOPATH/bin/cc-test-reporter
+  # Rust
+  - curl -sSf https://build.travis-ci.com/files/rustup-init.sh | sh -s -- --default-toolchain="nightly" -y
+  - export PATH=$HOME/.cargo/bin:$PATH
+  - rustc --version
 
 install: ./internal/ci/install_dependencies
 

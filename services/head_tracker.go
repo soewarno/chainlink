@@ -218,7 +218,7 @@ func (ht *HeadTracker) listenToNewHeads() {
 		select {
 		case header := <-ht.headers:
 			number := header.ToIndexableBlockNumber()
-			logger.Debugw(fmt.Sprintf("Received header %v with hash %s", presenters.FriendlyBigInt(number.ToInt()), header.Hash().String()), "hash", header.Hash())
+			//logger.Debugw(fmt.Sprintf("Received header %v with hash %s", presenters.FriendlyBigInt(number.ToInt()), header.Hash().String()), "hash", header.Hash())
 			if err := ht.Save(number); err != nil {
 				logger.Error(err.Error())
 			} else {

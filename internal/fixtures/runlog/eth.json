@@ -1,0 +1,37 @@
+{
+  "initiators": [
+    {
+      "type": "runlog",
+      "address": "0xf41adafc551037ba549a38698c38c88d24eb10e6"
+    }
+  ],
+  "tasks": [
+    {
+      "confirmations": 0,
+      "type": "httpget",
+      "url": "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
+    },
+    {
+      "confirmations": 0,
+      "path": [
+        "USD"
+      ],
+      "type": "jsonparse"
+    },
+    {
+      "confirmations": 0,
+      "times": 10000,
+      "type": "multiply"
+    },
+    {
+      "confirmations": 0,
+      "type": "ethuint256"
+    },
+    {
+      "confirmations": 0,
+      "type": "ethtx"
+    }
+  ],
+  "startAt": null,
+  "endAt": null
+}

@@ -19,7 +19,7 @@ type SessionsController struct {
 // Create creates a session ID for the given user credentials, and returns it
 // in a cookie.
 func (sc *SessionsController) Create(c *gin.Context) {
-	defer sc.App.Reaper.ReapSessions()
+	defer sc.App.Reaper.Start()
 
 	session := sessions.Default(c)
 	var sr models.SessionRequest

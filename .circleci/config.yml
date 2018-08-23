@@ -64,6 +64,16 @@ jobs:
           paths:
             - /usr/local/share/.cache/yarn
       - run: ./internal/ci/gui_test
+  deploy:
+    working_directory: /go/src/github.com/smartcontractkit/chainlink
+    docker:
+      - image: smartcontract/builder:1.0.6
+    environment:
+      ENVIRONMENT: release
+      DOCKER_TAG: staging
+    steps:
+      - run: make docker
+      - run: make dockerpush
 
 workflows:
   version: 2
@@ -73,3 +83,12 @@ workflows:
       - truffle
       - geth
       - gui
+      - deploy:
+          requires:
+            - go
+            - truffle
+            - geth
+            - gui
+          filters:
+            branches:
+              only: master

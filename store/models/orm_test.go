@@ -2,8 +2,11 @@ package models_test
 
 import (
 	"encoding/hex"
+	"io/ioutil"
 	"math/big"
 	"net/url"
+	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -538,4 +541,21 @@ func TestORM_CreateSession(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestORM_MigrateSessionAgreement(t *testing.T) {
+	dir, err := ioutil.TempDir("", "example")
+	assert.NoError(t, err)
+
+	defer os.RemoveAll(dir)
+	db := path.Join(dir, "bolt.db")
+
+	_, err = models.NewORM(db, 5*time.Second)
+	assert.NoError(t, err)
+
+	// insert an old SA
+	// close DB
+
+	// open DB again
+	// find DB using new type
 }
